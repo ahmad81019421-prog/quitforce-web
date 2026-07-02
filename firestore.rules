@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == 'admin';
+    }
+
+    // ───────────────────────── Users ─────────────────────────
+    // Read is open to signed-in users (so demo Admin can aggregate),
+    // but writes are tightly field-scoped.
+    //
+    // ⚠️ `penaltyCount` IS allowed here because the client-side
+    // `recordRelapse()` flow legitimately increments it via WriteBatch
+    // every time a user self-reports "I Smoked" — blocking it breaks
+    // that core flow with permission-denied.
+    //
+    // `lastInactivityPenaltyAt` is deliberately NOT in this list. It's
+    // only ever written by the Vercel enforcement-api's Admin SDK, which
+    // bypasses these rules entirely — allowing client writes to it would
+    // let a user spoof their own cooldown timer to dodge the automatic
+    // inactivity penalty. In production, move `penaltyCount` to a
+    // Callable Cloud Function too and remove it from this list.
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['name','email','onboardingComplete','createdAt']);
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly([
+              'name','email','onboardingComplete',
+              'cigsPerDay','yearsSmoking','pricePerPack','trigger','profileType',
+              'depositAmount','quitDate',
+              'lastActiveAt','fcmToken','penaltyCount',
+              'commitmentSignature'
+            ]);
+      allow delete: if isOwner(uid);
+
+      match /cravingLogs/{logId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ───────────────────────── Wallets ─────────────────────────
+    // ⚠️ DEMO NOTE: balance updates from the client are temporarily
+    // allowed so the current client-side recordRelapse / depositToWallet
+    // flows keep working. Before scaling, move every wallet write to a
+    // Callable Cloud Function and tighten this rule to read-only.
+    match /wallets/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['balance','lockedAmount','createdAt']);
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['balance']);
+      allow delete: if isOwner(uid);
+
+      match /transactions/{txId} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isOwner(uid);
+        allow update, delete: if isOwner(uid);
+      }
+    }
+
+    // ───────────────────────── Community posts ─────────────────────────
+    // Posts are readable by any signed-in user, creatable by their author,
+    // deletable by their author. Updates are restricted to the `likedBy`
+    // field ONLY — so any signed-in user can like/unlike, but nobody can
+    // silently rewrite someone else's post text, uid, or comment count.
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['uid','name','text','achievement','likedBy','commentsCount','createdAt']);
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['likedBy'])
+        && request.resource.data.uid == resource.data.uid;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "quitforce-enforcement-api",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "firebase-admin": "^12.1.0"
+  }
+}

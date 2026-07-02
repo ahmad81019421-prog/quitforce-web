@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #000;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[dir='rtl'] body { font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif; }
+
+.font-num { font-family: 'JetBrains Mono', monospace; }
+
+/* Stage-driven ambient background, swapped via data-stage on <html> */
+[data-stage='early']    { --stage-color: #FF3B30; --stage-dim: #7A1410; }
+[data-stage='progress'] { --stage-color: #BF5AF2; --stage-dim: #4B1A66; }
+[data-stage='freedom']  { --stage-color: #FFD700; --stage-dim: #6B5800; }
+
+.stage-glow {
+  box-shadow: 0 0 80px -20px var(--stage-color);
+}
+
+.ambient-bg {
+  background:
+    radial-gradient(ellipse 60% 40% at 50% -10%, color-mix(in srgb, var(--stage-color) 22%, transparent), transparent 70%),
+    #000;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #2a2a2c; border-radius: 8px; }
+
+:focus-visible {
+  outline: 2px solid var(--stage-color, #BF5AF2);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

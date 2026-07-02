@@ -1,0 +1,37 @@
+{
+  "name": "quitforce-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:sw": "node scripts/gen-sw.js",
+    "prebuild": "npm run build:sw",
+    "build": "vite build",
+    "preview": "vite preview",
+    "set-admin": "node scripts/setAdmin.js"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "firebase": "^10.12.0",
+    "framer-motion": "^11.17.0",
+    "i18next": "^23.11.5",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.383.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^14.1.2",
+    "react-router-dom": "^6.26.0",
+    "recharts": "^2.12.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "dotenv": "^16.4.5",
+    "firebase-admin": "^14.1.0",
+    "postcss": "^8.4.40",
+    "tailwindcss": "^3.4.7",
+    "vite": "^8.1.3"
+  }
+}
