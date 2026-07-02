@@ -174,3 +174,5 @@ gzipped (down from ~352 KB before splitting).
   (Apple's platform restriction, not something this project controls).
 - The distraction mini-game's difficulty and the breathing lock's demo
   duration (30s vs. the spec's 10min) are tunable constants.
+#   q u i t f o r c e - w e b  
+ 
