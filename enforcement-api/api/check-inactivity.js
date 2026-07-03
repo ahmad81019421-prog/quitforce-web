@@ -139,10 +139,15 @@ module.exports = async (req, res) => {
     }
   }
 
-  return res.status(200).json({
+return res.status(200).json({
     checked: usersSnap.size,
     penalized: results.length,
     results,
-    errors
+    errors,
+    debug: {
+      INACTIVITY_HOURS_raw: process.env.INACTIVITY_HOURS,
+      inactivityMs,
+      nowIso: new Date(now).toISOString()
+    }
   })
 }
