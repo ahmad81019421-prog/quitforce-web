@@ -62,16 +62,17 @@
     "taskTitle": "Move for 20 seconds",
     "taskSub": "Boredom cravings fade fast once your body has something else to do. Stand up, stretch, walk a few steps.",
     "taskMarkDone": "I did it",
-    "confirmSmokedCheckbox": "أؤكد أنني دخّنت فعلاً",
-"overLimit": "تجاوزت الحد اليومي ({{total}}/{{limit}})",
-"restartStreakQuestion": "بدك تعيد عداد الأيام النظيفة من الصفر؟",
-"restartYes": "نعم، إعادة",
-"restartNo": "لا، متابعة",
-"withinLimit": "ضمن حدك اليومي ({{total}}/{{limit}}) — بدون خصم",
-"noPenalty": "استمر، أنت لسا ضمن خطتك.",
+    "confirmSmokedCheckbox": "I confirm that I actually smoked",
+    "overLimit": "You exceeded today’s limit ({{total}}/{{limit}})",
+    "restartStreakQuestion": "Do you want to reset your clean streak from scratch?",
+    "restartYes": "Yes, reset",
+    "restartNo": "No, continue",
+    "withinLimit": "Within your daily limit ({{total}}/{{limit}}) — no penalty",
+    "noPenalty": "Keep going, you’re still on plan.",
     "taskDone": "Nice work",
     "accountabilityTitle": "Reach out before you light up",
     "accountabilitySub": "Message your accountability partner now — just telling someone you're craving often breaks the urge.",
+
     "accountabilityContact": "I messaged them",
     "accountabilityDone": "Logged — well done",
     "score": "Score",
@@ -247,9 +248,10 @@
     "noTransactions": "No transactions yet"
   },
   "checkin": {
-  "title": "تسجيل اليوم",
-  "subtitle": "قبل ما تكمل، خبرنا هل دخّنت اليوم؟",
-  "yes": "نعم، دخّنت",
-  "no": "لا، بقيت نظيف اليوم"
+    "title": "Daily check-in",
+    "subtitle": "Before you continue, tell us if you smoked today.",
+    "yes": "Yes, I smoked",
+    "no": "No, I stayed clean today"
+  }
 }
-}
+

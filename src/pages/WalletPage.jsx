@@ -7,7 +7,7 @@ import BottomNav from '../components/BottomNav'
 import LanguageSwitch from '../components/LanguageSwitch'
 import { useStage } from '../hooks/useStage'
 import { useAuth } from '../lib/AuthContext'
-import { watchWallet, watchTransactions, depositToWallet } from '../lib/firestore'
+import { watchWallet, watchTransactions, depositToWallet, withdrawFromWallet } from '../lib/firestore'
 
 // ── Demo card numbers per method ─────────────────────────────────────────────
 const DEMO_CARDS = {
@@ -93,7 +93,7 @@ function InputField({ label, value, onChange, placeholder, type='text', maxLengt
 
 export default function WalletPage() {
   const { t } = useTranslation()
-  const { tokens } = useStage()
+  const { tokens, stage } = useStage()
   const { user } = useAuth()
 
   const [wallet, setWallet]           = useState(null)
@@ -105,6 +105,9 @@ export default function WalletPage() {
   const [step, setStep]               = useState(0)   // 0=method 1=details 2=confirm 3=done
   const [showHistory, setShowHistory] = useState(false)
   const [processingDots, setProcessingDots] = useState('')
+  const [withdrawing, setWithdrawing] = useState(false)
+  const [withdrawAmount, setWithdrawAmount] = useState(0)
+  const [withdrawSuccess, setWithdrawSuccess] = useState(false)
 
   // card form state
   const [cardNum, setCardNum]   = useState('')
@@ -122,6 +125,11 @@ export default function WalletPage() {
     const u2 = watchTransactions(user.uid, setTransactions)
     return () => { u1(); u2() }
   }, [user])
+
+  // keep withdrawAmount in sync with balance when wallet loads
+  useEffect(() => {
+    if (wallet && typeof wallet.balance === 'number') setWithdrawAmount(Number(wallet.balance.toFixed(2)))
+  }, [wallet])
 
   // animate processing dots
   useEffect(() => {
@@ -425,6 +433,55 @@ export default function WalletPage() {
             </motion.button>
           )}
         </PremiumGlassCard>
+
+        {/* ── Withdraw (available at Freedom stage) ── */}
+        {stage === 'freedom' && (
+          <PremiumGlassCard padding="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-white font-semibold text-sm">Withdraw Funds</p>
+              <p className="text-white/30 text-xs">Available after 30 days smoke-free</p>
+            </div>
+
+            <p className="text-white/40 text-xs mb-3">You may withdraw funds from your wallet now.</p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-white/40 text-xs mb-1 block">Amount ($)</label>
+                <input type="number" value={withdrawAmount}
+                  onChange={e => setWithdrawAmount(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none"
+                />
+              </div>
+
+              {withdrawSuccess ? (
+                <div className="text-center">
+                  <p className="text-green-400 font-semibold">Withdrawal successful</p>
+                </div>
+              ) : (
+                <button onClick={async () => {
+                  if (!user) return
+                  if (!withdrawAmount || withdrawAmount <= 0) return
+                  if (withdrawAmount > (wallet?.balance || 0)) return
+                  setWithdrawing(true)
+                  try {
+                    await withdrawFromWallet(user.uid, Number(withdrawAmount))
+                    setWithdrawSuccess(true)
+                  } catch (err) {
+                    console.error('Withdraw failed:', err)
+                    // TODO: show user-facing error
+                  } finally {
+                    setWithdrawing(false)
+                  }
+                }}
+                disabled={withdrawing || !(withdrawAmount > 0 && withdrawAmount <= (wallet?.balance || 0))}
+                className="w-full rounded-xl py-3 text-sm font-semibold text-black transition-opacity"
+                style={{ background: `linear-gradient(135deg, ${tokens.color}, ${tokens.dim})` }}>
+                  {withdrawing ? 'Processing…' : 'Confirm Withdraw'}
+                </button>
+              )}
+            </div>
+          </PremiumGlassCard>
+        )}
 
         {/* ── Transaction history ── */}
         <PremiumGlassCard padding="p-5">
