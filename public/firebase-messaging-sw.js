@@ -26,8 +26,7 @@ const FIREBASE_CONFIG = {
 }
 
 try {
-  if (FIREBASE_CONFIG.apiKey === 'AIzaSyAvKl66J1m99lBZn-Yqa1dUvwVpAUINBQU') {
-    console.warn('[firebase-messaging-sw] Still using placeholders. Run `npm run build:sw` or paste real values into this file.')
+if (FIREBASE_CONFIG.apiKey.startsWith('__')) {    console.warn('[firebase-messaging-sw] Still using placeholders. Run `npm run build:sw` or paste real values into this file.')
   } else {
     firebase.initializeApp(FIREBASE_CONFIG)
     const messaging = firebase.messaging()
