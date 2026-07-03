@@ -143,11 +143,6 @@ return res.status(200).json({
     checked: usersSnap.size,
     penalized: results.length,
     results,
-    errors,
-    debug: {
-      INACTIVITY_HOURS_raw: process.env.INACTIVITY_HOURS,
-      inactivityMs,
-      nowIso: new Date(now).toISOString()
-    }
+    errors
   })
 }
