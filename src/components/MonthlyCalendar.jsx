@@ -25,7 +25,7 @@ function buildMonthStatus(logs, quitDate) {
 
   const relapseDays = new Set(
     logs
-      .filter((l) => l.outcome === 'smoked')
+      .filter((l) => l.outcome === 'smoked-over-limit')
       .map((l) => toJsDate(l.createdAt))
       .filter((d) => d && d.getFullYear() === year && d.getMonth() === month)
       .map((d) => d.getDate())
